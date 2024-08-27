@@ -9,12 +9,34 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+model Session {
+  id        Int      @id @default(autoincrement())
+  //token     String
+  conversations Conversation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  messages  Message[]
+  sessionId Int
+  Session   Session @relation(fields: [sessionId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-    @@index([name])
+enum MESSAGE_SOURCES {
+  USER
+  SYSTEM
+}
+
+model Message {
+  id             Int      @id @default(autoincrement())
+  content        String
+  source         MESSAGE_SOURCES
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  conversationId Int
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
