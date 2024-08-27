@@ -3,15 +3,30 @@ import Link from "next/link";
 //import { LatestPost } from "~/app/_components/post";
 import { api, HydrateClient } from "~/trpc/server";
 
-/* import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
- */
+import { Button } from "./_components/ui/button";
+import { Textarea } from "./_components/ui/textarea";
+
+import { ConversationItem } from "./_components/conversation/ConversationItem";
 
 export default async function Home() {
   //const hello = await api.post.hello({ text: "from tRPC" });
 
   //void api.post.getLatest.prefetch();
+
+  const conversations = [
+    {
+      id: 1,
+      content: "Did you see the new design?",
+    },
+    {
+      id: 2,
+      content: "Let us discuss the project timeline.",
+    },
+    {
+      id: 3,
+      content: "I have a few questions about the API.",
+    },
+  ];
 
   return (
     <HydrateClient>
@@ -25,81 +40,19 @@ export default async function Home() {
             >
               <span>Chat App</span>
             </Link>
-            {/* <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon">
               <PlusIcon className="h-5 w-5" />
               <span className="sr-only">New Chat</span>
-            </Button> */}
+            </Button>
           </div>
-          <div className="flex-1 overflow-auto p-4">
+          <div className="flex-1 p-4">
             <div className="grid gap-4">
-              <Link
-                href="#"
-                className="hover:bg-muted flex items-center gap-3 rounded-md p-2 transition-colors"
-                prefetch={false}
-              >
-                {/* <Avatar className="h-10 w-10 border">
-                  <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                  <AvatarFallback>AC</AvatarFallback>
-                </Avatar> */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="truncate font-medium">Acme Inc</div>
-                  <div className="text-muted-foreground truncate text-sm">
-                    Hey, how&apos;s it going?
-                  </div>
-                </div>
-                <div className="text-muted-foreground text-xs">2h</div>
-              </Link>
-              <Link
-                href="#"
-                className="hover:bg-muted flex items-center gap-3 rounded-md p-2 transition-colors"
-                prefetch={false}
-              >
-                {/* <Avatar className="h-10 w-10 border">
-                  <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar> */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="truncate font-medium">John Doe</div>
-                  <div className="text-muted-foreground truncate text-sm">
-                    Did you see the new design?
-                  </div>
-                </div>
-                <div className="text-muted-foreground text-xs">1d</div>
-              </Link>
-              <Link
-                href="#"
-                className="hover:bg-muted flex items-center gap-3 rounded-md p-2 transition-colors"
-                prefetch={false}
-              >
-                {/* <Avatar className="h-10 w-10 border">
-                  <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                  <AvatarFallback>SA</AvatarFallback>
-                </Avatar> */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="truncate font-medium">Sarah Anderson</div>
-                  <div className="text-muted-foreground truncate text-sm">
-                    Let us discuss the project timeline.
-                  </div>
-                </div>
-                <div className="text-muted-foreground text-xs">3d</div>
-              </Link>
-              <Link
-                href="#"
-                className="hover:bg-muted flex items-center gap-3 rounded-md p-2 transition-colors"
-                prefetch={false}
-              >
-                {/* <Avatar className="h-10 w-10 border">
-                  <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                  <AvatarFallback>MJ</AvatarFallback>
-                </Avatar> */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="truncate font-medium">Michael Johnson</div>
-                  <div className="text-muted-foreground truncate text-sm">
-                    I have a few questions about the API.
-                  </div>
-                </div>
-                <div className="text-muted-foreground text-xs">1w</div>
-              </Link>
+              {conversations.map((conversation) => (
+                <ConversationItem
+                  key={conversation.id}
+                  content={conversation.content}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -178,7 +131,7 @@ export default async function Home() {
           </div>
           <div className="bg-muted/40 border-t p-4">
             <div className="relative">
-              {/* <Textarea
+              <Textarea
                 placeholder="Type your message..."
                 className="min-h-[48px] w-full rounded-2xl border border-neutral-400 p-4 pr-16 shadow-sm"
               />
@@ -189,11 +142,133 @@ export default async function Home() {
               >
                 <SendIcon className="h-5 w-5" />
                 <span className="sr-only">Send</span>
-              </Button> */}
+              </Button>
             </div>
           </div>
         </div>
       </div>
     </HydrateClient>
+  );
+}
+
+function MoveHorizontalIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="18 8 22 12 18 16" />
+      <polyline points="6 8 2 12 6 16" />
+      <line x1="2" x2="22" y1="12" y2="12" />
+    </svg>
+  );
+}
+
+function PaperclipIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+    </svg>
+  );
+}
+
+function PlusIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+function SearchIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function SendIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
+    </svg>
+  );
+}
+
+function WebcamIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="10" r="8" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M7 22h10" />
+      <path d="M12 22v-4" />
+    </svg>
   );
 }
