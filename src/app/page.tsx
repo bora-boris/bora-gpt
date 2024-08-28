@@ -1,7 +1,9 @@
-import Link from "next/link";
+import { PlusIcon } from "./_components/icons/PlusIcon";
+import { SendIcon } from "./_components/icons/SendIcon";
 
 //import { LatestPost } from "~/app/_components/post";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
+import { api } from "~/trpc/react";
 
 import { Button } from "./_components/ui/button";
 import { Textarea } from "./_components/ui/textarea";
@@ -10,8 +12,6 @@ import { ConversationList } from "./_components/conversation/ConversationList";
 import { MessageList } from "./_components/message/MessageList";
 
 export default async function Home() {
-  //const hello = await api.post.hello({ text: "from tRPC" });
-
   //void api.post.getLatest.prefetch();
 
   const conversations = [
@@ -55,6 +55,24 @@ export default async function Home() {
       source: "SYSTEM",
     },
   ];
+
+  const createConversationMutation = api.conversation.create.useMutation();
+
+  const handleCreateNewConversation = () => {
+    createConversationMutation.mutate(
+      {
+        sessionId: "1234",
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Conversation created:", data);
+        },
+        onError: (error) => {
+          console.error("Failed to create conversation:", error);
+        },
+      },
+    );
+  };
 
   return (
     <HydrateClient>
@@ -109,45 +127,5 @@ export default async function Home() {
         </div>
       </div>
     </HydrateClient>
-  );
-}
-
-function PlusIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
-  );
-}
-
-function SendIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m22 2-7 20-4-9-9-4Z" />
-      <path d="M22 2 11 13" />
-    </svg>
   );
 }
