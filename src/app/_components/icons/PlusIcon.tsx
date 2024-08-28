@@ -14,8 +14,8 @@ export const PlusIcon = (props) => {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="m22 2-7 20-4-9-9-4Z" />
-      <path d="M22 2 11 13" />
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
     </svg>
   );
 };
