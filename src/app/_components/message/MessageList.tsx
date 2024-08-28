@@ -11,11 +11,13 @@ export const MessageList: React.FC<{ messages: Message[] }> = ({
   messages,
 }) => {
   // get timestamp of most recent message
-  return (
+  return messages?.length ? (
     <div>
       {messages.map((message) => (
         <MessageItem key={message.id} message={message} />
       ))}
     </div>
+  ) : (
+    <></>
   );
 };

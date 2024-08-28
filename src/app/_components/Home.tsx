@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -12,49 +12,23 @@ import { PlusIcon } from "./icons/PlusIcon";
 import { SendIcon } from "./icons/SendIcon";
 
 import { api } from "~/trpc/react";
+import { set } from "zod";
 
 export const Home = () => {
-  const conversations = [
-    {
-      id: "1",
-      content: "Did you see the new design?",
-    },
-    {
-      id: "2",
-      content: "Let us discuss the project timeline.",
-    },
-    {
-      id: "3",
-      content: "I have a few questions about the API.",
-    },
-  ];
+  const [activeConversation, setActiveConversation] = useState(null);
+  console.log("activeConversation", activeConversation);
+  const [messageText, setMessageText] = useState("");
+  const handleMessageChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setMessageText(event.target.value);
+  };
 
-  const messages = [
-    {
-      id: "1",
-      content: "Hey, how's it going?",
-      timestamp: "2h",
-      source: "USER",
-    },
-    {
-      id: "2",
-      content: "Pretty good, thanks for asking!",
-      timestamp: "2h",
-      source: "SYSTEM",
-    },
-    {
-      id: "3",
-      content: "Did you see the new design?",
-      timestamp: "1d",
-      source: "USER",
-    },
-    {
-      id: "4",
-      content: "Yes, I did! It looks great.",
-      timestamp: "1d",
-      source: "SYSTEM",
-    },
-  ];
+  const {
+    data: conversations = [],
+    isLoading,
+    isError,
+  } = api.conversation.getBySessionId.useQuery({ sessionId: "1234" });
 
   const createConversationMutation = api.conversation.create.useMutation();
 
@@ -65,7 +39,9 @@ export const Home = () => {
       },
       {
         onSuccess: (data) => {
+          setActiveConversation(data);
           console.log("Conversation created:", data);
+          return data;
         },
         onError: (error) => {
           console.error("Failed to create conversation:", error);
@@ -73,9 +49,44 @@ export const Home = () => {
       },
     );
   };
+
+  const addMessageMutation = api.conversation.addMessage.useMutation();
+
+  const handleMessageSubmit = async () => {
+    if (!messageText.length) {
+      return;
+    }
+
+    addMessageMutation.mutate(
+      {
+        sessionId: "1234",
+        conversationId: activeConversation?.id || null,
+        message: messageText,
+      },
+      {
+        onSuccess: (data) => {
+          setActiveConversation(data);
+          console.log("Conversation updated:", data);
+          setMessageText("");
+        },
+        onError: (error) => {
+          console.error("Failed to add message to conversation:", error);
+        },
+      },
+    );
+  };
+
+  const handleTextAreaKeyDown = (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); // Prevents the default newline behavior
+      handleMessageSubmit();
+    }
+  };
   return (
-    <div className="bg-background text-foreground flex min-h-screen w-full">
-      <div className="bg-muted/40 hidden w-64 border-r md:block">
+    <div className="flex min-h-screen w-full bg-background text-foreground">
+      <div className="hidden w-64 border-r bg-muted/40 md:block">
         <div className="flex h-16 items-center justify-between border-b px-4">
           <span>Conversations</span>
           <Button
@@ -94,7 +105,7 @@ export const Home = () => {
         </div>
       </div>
       <div className="flex flex-1 flex-col">
-        <header className="bg-muted/40 flex h-16 items-center border-b px-4 md:px-6">
+        <header className="flex h-16 items-center border-b bg-muted/40 px-4 md:px-6">
           <div className="flex items-center gap-3">
             {/* <Avatar className="h-10 w-10 border">
                 <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
@@ -107,19 +118,24 @@ export const Home = () => {
         </header>
         <div className="flex-1 overflow-auto p-4">
           <div className="grid gap-4">
-            <MessageList messages={messages} />
+            <MessageList messages={activeConversation?.messages} />
           </div>
         </div>
-        <div className="bg-muted/40 border-t p-4">
+        <div className="border-t bg-muted/40 p-4">
           <div className="relative">
             <Textarea
+              value={messageText}
+              onChange={handleMessageChange}
+              onKeyDown={handleTextAreaKeyDown}
               placeholder="Type your message..."
               className="min-h-[48px] w-full rounded-2xl border border-neutral-400 p-4 pr-16 shadow-sm"
             />
             <Button
               type="submit"
               size="icon"
+              disabled={!messageText.length}
               className="absolute right-3 top-3"
+              onClick={handleMessageSubmit}
             >
               <SendIcon className="h-5 w-5" />
               <span className="sr-only">Send</span>

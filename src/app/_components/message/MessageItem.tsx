@@ -13,7 +13,7 @@ export const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   // TODO make this better
   const isUser = message.source === "USER";
 
-  const containerClass = `flex ${isUser ? "items-start justify-end" : "items-start"} gap-4`;
+  const containerClass = `flex pb-4 ${isUser ? "items-start justify-end" : "items-start"} gap-4`;
   const messageClass = `grid gap-1 rounded-md p-3 text-sm ${isUser ? "bg-primary text-primary-foreground" : "bg-muted"}`;
   const timestampClass = `text-xs ${isUser ? "text-primary-foreground/80" : "text-muted-foreground"}`;
 
