@@ -1,21 +1,19 @@
 import React from "react";
 import { ConversationItem } from "./ConversationItem";
+import { type Conversation } from "@prisma/client";
 
-type Conversation = {
-  id: string;
-  content: string;
-};
-
-export const ConversationList: React.FC<{ conversations: Conversation[] }> = ({
-  conversations,
-}) => {
+export const ConversationList: React.FC<{
+  conversations: Conversation[];
+  setActiveConversation: (conversation: Conversation) => void;
+}> = ({ conversations, setActiveConversation }) => {
   // get timestamp of most recent message
   return (
     <div>
       {conversations.map((conversation) => (
         <ConversationItem
           key={conversation.id}
-          content={conversation.content}
+          conversation={conversation}
+          setActiveConversation={setActiveConversation}
         />
       ))}
     </div>

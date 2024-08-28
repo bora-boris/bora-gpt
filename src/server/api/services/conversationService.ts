@@ -14,6 +14,7 @@ export const getConversations = async (
   const conversations = await db.conversation.findMany({
     where: { sessionId },
     orderBy: { createdAt: "desc" },
+    include: { messages: true },
   });
   return conversations;
 };
@@ -25,6 +26,7 @@ export const addMessageToConversation = async (input: {
   await db.conversation.update({
     where: { id: input.conversationId },
     data: {
+      preview: input.message,
       messages: {
         create: {
           content: input.message,

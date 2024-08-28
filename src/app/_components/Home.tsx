@@ -76,12 +76,12 @@ export const Home = () => {
     );
   };
 
-  const handleTextAreaKeyDown = (
+  const handleTextAreaKeyDown = async (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
   ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents the default newline behavior
-      handleMessageSubmit();
+      await handleMessageSubmit();
     }
   };
   return (
@@ -100,7 +100,10 @@ export const Home = () => {
         </div>
         <div className="flex-1 p-4">
           <div className="grid gap-4">
-            <ConversationList conversations={conversations} />
+            <ConversationList
+              conversations={conversations}
+              setActiveConversation={setActiveConversation}
+            />
           </div>
         </div>
       </div>
