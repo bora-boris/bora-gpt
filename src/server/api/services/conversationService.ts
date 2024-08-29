@@ -1,6 +1,16 @@
 import { db } from "~/server/db";
-import { MESSAGE_SOURCES, type Conversation } from "@prisma/client";
+import {
+  type Prisma,
+  MESSAGE_SOURCES,
+  type Conversation,
+} from "@prisma/client";
 import { getResponseFromOpenAI } from "./openAIService";
+
+// Had to do this since Prisma doesn't export a Model's relations in the type definitions by default
+// https://github.com/prisma/prisma/discussions/10928
+type ConversationWithMessages = Prisma.ConversationGetPayload<{
+  include: { messages: true };
+}>;
 
 export const createConversation = async (input: {
   sessionId: string;
@@ -49,32 +59,36 @@ export const submitUserMessage = async (input: {
     messageSource: MESSAGE_SOURCES.USER,
   });
 
-  generateSystemResponse(input).catch((error) => {
-    console.error("Problem generating system response:", error);
-  });
-
   const updatedConversation = await db.conversation.findFirst({
     where: { id: input.conversationId },
     include: { messages: true },
   });
+
   if (!updatedConversation) {
     throw new Error("Failed to find updated conversation");
   }
+
+  generateSystemResponse({
+    message: input.message,
+    conversation: updatedConversation,
+  }).catch((error) => {
+    console.error("Problem generating system response:", error);
+  });
 
   return updatedConversation;
 };
 
 export const generateSystemResponse = async (input: {
   message: string;
-  conversationId: number;
+  conversation: ConversationWithMessages;
 }): Promise<void> => {
-  const response = await getResponseFromOpenAI(input.message);
+  const response = await getResponseFromOpenAI(input);
   const content =
     response?.content ?? "Sorry, I am not able to respond to that.";
 
   await addMessageToConversation({
     message: content,
-    conversationId: input.conversationId,
+    conversationId: input.conversation.id,
     messageSource: MESSAGE_SOURCES.SYSTEM,
   });
 };

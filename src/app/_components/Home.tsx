@@ -12,7 +12,6 @@ import { PlusIcon } from "./icons/PlusIcon";
 import { SendIcon } from "./icons/SendIcon";
 
 import { api } from "~/trpc/react";
-import { set } from "zod";
 
 export const Home = () => {
   const [activeConversation, setActiveConversation] = useState(null);
