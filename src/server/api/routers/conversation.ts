@@ -5,7 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   createConversation,
   getConversations,
-  addMessageToConversation,
+  submitUserMessage,
 } from "~/server/api/services/conversationService";
 
 export const conversationRouter = createTRPCRouter({
@@ -40,7 +40,7 @@ export const conversationRouter = createTRPCRouter({
         throw new Error("Failed to find a valid conversation");
       }
 
-      return addMessageToConversation({
+      return submitUserMessage({
         conversationId: conversationId,
         message: input.message,
       });

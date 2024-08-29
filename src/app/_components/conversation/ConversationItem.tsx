@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { type Conversation } from "@prisma/client";
+import { getTimeSince } from "../../utils/time";
 
 export const ConversationItem: React.FC<{
   conversation: Conversation;
@@ -22,8 +23,9 @@ export const ConversationItem: React.FC<{
           {conversation.preview}
         </div>
       </div>
-      {/*       <div className="text-muted-foreground text-xs">2h</div>
-       */}{" "}
+      <div className="text-xs text-muted-foreground">
+        {getTimeSince(conversation.updatedAt)}
+      </div>
     </Link>
   );
 };
