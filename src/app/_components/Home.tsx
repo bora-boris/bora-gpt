@@ -137,7 +137,7 @@ export const Home = () => {
               type="submit"
               size="icon"
               disabled={!messageText.length}
-              className="absolute right-3 top-3"
+              className="absolute right-4 top-4"
               onClick={handleMessageSubmit}
             >
               <SendIcon className="h-5 w-5" />
