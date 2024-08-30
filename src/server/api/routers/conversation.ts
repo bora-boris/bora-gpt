@@ -6,7 +6,7 @@ import {
   createConversation,
   getConversations,
   submitUserMessage,
-} from "~/server/api/services/conversationService";
+} from "~/server/api/services/conversation.service";
 
 export const conversationRouter = createTRPCRouter({
   create: publicProcedure
