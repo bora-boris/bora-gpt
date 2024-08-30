@@ -14,7 +14,6 @@ export const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   const IconComponent =
     message.source === MESSAGE_SOURCES.SYSTEM && getIconForTone(message.tone);
 
-  // get timestamp of most recent message
   return (
     <div className={containerClass}>
       <div className={messageClass}>

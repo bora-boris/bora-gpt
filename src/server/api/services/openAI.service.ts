@@ -111,7 +111,6 @@ const toolsFunctionMap: { [key: string]: Function } = {
 ////// TOOL PROCESSING //////
 
 const getToneForMessage = async (message: string): Promise<string> => {
-  console.log("getting tone for this message: ", message);
   const tonePrompt = `
   Given the following message, if it relates to weather, please categorize the response as Sunny, Cloudy, Rainy, or Not Applicable.
   The message is ${message};
@@ -125,8 +124,7 @@ const getToneForMessage = async (message: string): Promise<string> => {
     tools,
   });
   let tone = completion?.choices[0]?.message?.content;
-  console.log("tone: ", tone);
-  console.log("typeof tone: ", typeof tone);
+
   if (typeof tone !== "string") {
     return "none";
   }
@@ -134,6 +132,7 @@ const getToneForMessage = async (message: string): Promise<string> => {
   return trim(tone);
 };
 
+// Take the history of the conversation and feed it to the OpenAI API
 const buildMessagesForCompletionsAPI = (
   conversation: ConversationWithMessages,
 ): ChatMessage[] => {
@@ -173,7 +172,6 @@ const processToolCall = async (toolCall: ToolCall) => {
     function: { arguments: args, name: functionName },
   } = toolCall;
 
-  console.log(`Processing tool call: ${functionName} with args: ${args}`);
   const parsedArgs = JSON.parse(args);
   if (toolsFunctionMap[functionName]) {
     const results = await toolsFunctionMap[functionName](parsedArgs);
@@ -190,8 +188,6 @@ export const getResponseFromOpenAI = async (
   const messagesToAdd = [];
   let tone = "none";
 
-  console.log("Message chain: ", existingMessages);
-
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: existingMessages,
@@ -200,13 +196,15 @@ export const getResponseFromOpenAI = async (
 
   let message = completion?.choices[0]?.message;
   const toolCalls = message?.tool_calls ?? [];
+
+  // If OpenAI has requested to us our toolbox, let them!
+  // We'll process the tool calls and add the results to the conversation
   if (toolCalls.length) {
     messagesToAdd.push(completion?.choices[0]?.message);
     for (const toolCall of toolCalls) {
       const resultMessage = await processToolCall(toolCall);
       messagesToAdd.push(resultMessage);
     }
-    console.log("messagesToAdd: ", messagesToAdd);
 
     const rerunCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -214,7 +212,6 @@ export const getResponseFromOpenAI = async (
       tools,
     });
     message = rerunCompletion?.choices[0]?.message;
-    console.log("rerunCompletion: ", rerunCompletion?.choices[0]);
   }
 
   const response = message?.content;

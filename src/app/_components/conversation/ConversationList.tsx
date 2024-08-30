@@ -9,7 +9,7 @@ export const ConversationList: React.FC<{
   const orderedConversations = conversations
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
     .filter((conversation) => conversation.preview?.length);
-  // get timestamp of most recent message
+
   return (
     <div>
       {orderedConversations.map((conversation) => (
