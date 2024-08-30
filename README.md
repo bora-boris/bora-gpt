@@ -1,29 +1,28 @@
-# Create T3 App
+# Welcome to Bora-GPT
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is a Chat-GPT style application, intended to demonstrate the use of ReAct prompting via OpenAI function calling.
 
-## What's next? How do I make an app with this?
-
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
-
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
+## Cool Technologies Used
 - [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
+- [OpenAI](https://platform.openai.com/docs/guides/function-calling)
+- [Prisma](https://prisma.io)
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### Environment Variables
+You'll need to define these to interact with the external APIs
+- **OPENAI_API_KEY** (you can get one directly from OpenAI. I am on one of the minimum paid tiers)
+- **OPENAI_MODEL** (I chose one of the newer ones gpt-4o-mini)
+- **WEATHER_API_KEY** ([you can get one here](https://www.weatherapi.com/))
+- **DATABASE_URL** (use this to connect to your local PostgreSQL db. I left my example in .env.example)
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Get up and running 
+- yarn install
+- yarn db:generate (run migrations on the db)
+- yarn run dev
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Application Preview
 
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+![bora-gpt-2](https://github.com/user-attachments/assets/a8bab62f-db93-4bb6-8d75-f07ee5021790)
