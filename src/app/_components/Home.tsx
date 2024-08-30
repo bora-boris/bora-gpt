@@ -14,22 +14,48 @@ import { SendIcon } from "./icons/SendIcon";
 import { api } from "~/trpc/react";
 import { useCookies } from "react-cookie";
 
+const POLLING_INTERVAL = 2000;
+
 export const Home = () => {
   const [cookies] = useCookies(["session-id"]);
   const sessionId = cookies["session-id"];
   const [activeConversation, setActiveConversation] = useState(null);
   const [messageText, setMessageText] = useState("");
+  const [intervalTrigger, setIntervalTrigger] = useState(1);
+
   const handleMessageChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     setMessageText(event.target.value);
   };
 
-  const {
-    data: conversations = [],
-    isLoading,
-    isError,
-  } = api.conversation.getBySessionId.useQuery({ sessionId });
+  const { data: conversations = [] } = api.conversation.getBySessionId.useQuery(
+    { sessionId },
+  );
+
+  const { data: conversation, refetch: refetchConversation } =
+    api.conversation.getById.useQuery(
+      {
+        conversationId: activeConversation?.id,
+      },
+      { enabled: !!activeConversation?.id },
+    );
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIntervalTrigger(intervalTrigger + 1);
+    }, POLLING_INTERVAL);
+
+    if (!activeConversation?.id) {
+      return;
+    }
+
+    refetchConversation();
+  }, [intervalTrigger]);
+
+  useEffect(() => {
+    setActiveConversation(conversation);
+  }, [conversation?.updatedAt]);
 
   const createConversationMutation = api.conversation.create.useMutation();
 
@@ -41,7 +67,6 @@ export const Home = () => {
       {
         onSuccess: (data) => {
           setActiveConversation(data);
-          console.log("Conversation created:", data);
           return data;
         },
         onError: (error) => {

@@ -20,6 +20,21 @@ export const createConversation = async (input: {
   return conversation;
 };
 
+export const getConversation = async (
+  conversationId: number,
+): Promise<Conversation> => {
+  const conversation = await db.conversation.findFirst({
+    where: { id: conversationId },
+    include: { messages: true },
+  });
+
+  if (!conversation) {
+    throw new Error(`Failed to find conversation for id ${conversationId} `);
+  }
+
+  return conversation;
+};
+
 export const getConversations = async (
   sessionId: string,
 ): Promise<Conversation[]> => {

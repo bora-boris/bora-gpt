@@ -4,6 +4,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import {
   createConversation,
+  getConversation,
   getConversations,
   submitUserMessage,
 } from "~/server/api/services/conversation.service";
@@ -13,6 +14,11 @@ export const conversationRouter = createTRPCRouter({
     .input(z.object({ sessionId: z.string().min(1) }))
     .mutation(async ({ input }) => {
       return createConversation(input);
+    }),
+  getById: publicProcedure
+    .input(z.object({ conversationId: z.number() }))
+    .query(async ({ input }) => {
+      return getConversation(input.conversationId);
     }),
   getBySessionId: publicProcedure
     .input(z.object({ sessionId: z.string().min(1) }))
