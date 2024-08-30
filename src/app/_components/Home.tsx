@@ -31,9 +31,10 @@ export const Home = () => {
     setMessageText(event.target.value);
   };
 
-  const { data: conversations = [] } = api.conversation.getBySessionId.useQuery(
-    { sessionId },
-  );
+  let { data: conversations = [], refetch: refetchConversations } =
+    api.conversation.getBySessionId.useQuery({
+      sessionId,
+    });
 
   const { data: conversation, refetch: refetchConversation } =
     api.conversation.getById.useQuery(
@@ -109,6 +110,7 @@ export const Home = () => {
           setActiveConversation(data);
           console.log("Conversation updated:", data);
           setMessageText("");
+          refetchConversations();
         },
         onError: (error) => {
           console.error("Failed to add message to conversation:", error);
