@@ -26,6 +26,22 @@ export const Home = () => {
   const [intervalTrigger, setIntervalTrigger] = useState(1);
   const [isAwaitingAIResponse, setIsAwaitingAIResponse] = useState(false);
 
+  //// API Calls
+  let { data: conversations = [], refetch: refetchConversations } =
+    api.conversation.getBySessionId.useQuery({
+      sessionId,
+    });
+
+  const { data: conversation, refetch: refetchConversation } =
+    api.conversation.getById.useQuery(
+      {
+        conversationId: activeConversation?.id,
+      },
+      { enabled: !!activeConversation?.id },
+    );
+
+  const createConversationMutation = api.conversation.create.useMutation();
+
   // Poll for new messages (ideally use websockets)
   useEffect(() => {
     setTimeout(() => {
@@ -63,21 +79,6 @@ export const Home = () => {
   ) => {
     setMessageText(event.target.value);
   };
-
-  let { data: conversations = [], refetch: refetchConversations } =
-    api.conversation.getBySessionId.useQuery({
-      sessionId,
-    });
-
-  const { data: conversation, refetch: refetchConversation } =
-    api.conversation.getById.useQuery(
-      {
-        conversationId: activeConversation?.id,
-      },
-      { enabled: !!activeConversation?.id },
-    );
-
-  const createConversationMutation = api.conversation.create.useMutation();
 
   const handleCreateNewConversation = () => {
     createConversationMutation.mutate(
