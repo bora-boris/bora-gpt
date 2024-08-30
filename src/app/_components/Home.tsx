@@ -12,10 +12,12 @@ import { PlusIcon } from "./icons/PlusIcon";
 import { SendIcon } from "./icons/SendIcon";
 
 import { api } from "~/trpc/react";
+import { useCookies } from "react-cookie";
 
 export const Home = () => {
+  const [cookies] = useCookies(["session-id"]);
+  const sessionId = cookies["session-id"];
   const [activeConversation, setActiveConversation] = useState(null);
-  console.log("activeConversation", activeConversation);
   const [messageText, setMessageText] = useState("");
   const handleMessageChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>,
@@ -27,14 +29,14 @@ export const Home = () => {
     data: conversations = [],
     isLoading,
     isError,
-  } = api.conversation.getBySessionId.useQuery({ sessionId: "1234" });
+  } = api.conversation.getBySessionId.useQuery({ sessionId });
 
   const createConversationMutation = api.conversation.create.useMutation();
 
   const handleCreateNewConversation = () => {
     createConversationMutation.mutate(
       {
-        sessionId: "1234",
+        sessionId,
       },
       {
         onSuccess: (data) => {
@@ -58,7 +60,7 @@ export const Home = () => {
 
     addMessageMutation.mutate(
       {
-        sessionId: "1234",
+        sessionId,
         conversationId: activeConversation?.id || null,
         message: messageText,
       },
