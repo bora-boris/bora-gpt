@@ -20,30 +20,13 @@ const POLLING_INTERVAL = 3000;
 export const Home = () => {
   const [cookies] = useCookies(["session-id"]);
   const sessionId = cookies["session-id"];
+
   const [activeConversation, setActiveConversation] = useState(null);
   const [messageText, setMessageText] = useState("");
   const [intervalTrigger, setIntervalTrigger] = useState(1);
   const [isAwaitingAIResponse, setIsAwaitingAIResponse] = useState(false);
 
-  const handleMessageChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    setMessageText(event.target.value);
-  };
-
-  let { data: conversations = [], refetch: refetchConversations } =
-    api.conversation.getBySessionId.useQuery({
-      sessionId,
-    });
-
-  const { data: conversation, refetch: refetchConversation } =
-    api.conversation.getById.useQuery(
-      {
-        conversationId: activeConversation?.id,
-      },
-      { enabled: !!activeConversation?.id },
-    );
-
+  // Poll for new messages (ideally use websockets)
   useEffect(() => {
     setTimeout(() => {
       setIntervalTrigger(intervalTrigger + 1);
@@ -63,15 +46,36 @@ export const Home = () => {
     return lastMessage?.source;
   };
 
+  // Update the active conversation when a new message is received
   useEffect(() => {
     setActiveConversation(conversation);
 
+    // Update the loading indicator awaiting AI response
     if (getSourceOfLastMessage(conversation) === MESSAGE_SOURCES.USER) {
       setIsAwaitingAIResponse(true);
     } else {
       setIsAwaitingAIResponse(false);
     }
   }, [conversation?.updatedAt]);
+
+  const handleMessageChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setMessageText(event.target.value);
+  };
+
+  let { data: conversations = [], refetch: refetchConversations } =
+    api.conversation.getBySessionId.useQuery({
+      sessionId,
+    });
+
+  const { data: conversation, refetch: refetchConversation } =
+    api.conversation.getById.useQuery(
+      {
+        conversationId: activeConversation?.id,
+      },
+      { enabled: !!activeConversation?.id },
+    );
 
   const createConversationMutation = api.conversation.create.useMutation();
 
@@ -108,7 +112,6 @@ export const Home = () => {
       {
         onSuccess: (data) => {
           setActiveConversation(data);
-          console.log("Conversation updated:", data);
           setMessageText("");
           refetchConversations();
         },
@@ -153,10 +156,6 @@ export const Home = () => {
       <div className="flex flex-1 flex-col">
         <header className="flex h-16 items-center border-b bg-muted/40 px-4 md:px-6">
           <div className="flex items-center gap-3">
-            {/* <Avatar className="h-10 w-10 border">
-                <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                <AvatarFallback>AC</AvatarFallback>
-              </Avatar> */}
             <div>
               <div className="font-bold">Bora GPT</div>
             </div>
