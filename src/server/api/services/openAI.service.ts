@@ -31,6 +31,8 @@ const openAIRoles = {
   TOOL: "tool",
 };
 
+////// TOOL DEFINITIONS //////
+
 export const tools = [
   {
     type: "function",
@@ -51,7 +53,43 @@ export const tools = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "getAverageNumber",
+      description:
+        "Get the average of a list of numbers. Call this whenever you need to calculate the average of a list of numbers, for example when a customer asks 'What's the average of 1, 2, and 3?'",
+      parameters: {
+        type: "object",
+        properties: {
+          numbers: {
+            type: "array",
+            items: {
+              type: "number",
+            },
+            description: "An array of numbers to average",
+          },
+        },
+        required: ["numbers"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
+
+const getAverageNumber = async (input: { numbers: number[] }) => {
+  console.log("CALCULATING AVERAGE OF: ", input.numbers);
+  const { numbers } = input;
+  const sum = numbers.reduce((acc, num) => acc + num, 0);
+  return { average: sum / numbers.length };
+};
+
+const toolsFunctionMap: { [key: string]: Function } = {
+  getWeather,
+  getAverageNumber,
+};
+
+////// TOOL PROCESSING //////
 
 const getToneForMessage = async (message: string): Promise<string> => {
   console.log("getting tone for this message: ", message);
@@ -75,10 +113,6 @@ const getToneForMessage = async (message: string): Promise<string> => {
   }
 
   return trim(tone);
-};
-
-const toolsFunctionMap: { [key: string]: Function } = {
-  getWeather,
 };
 
 const buildMessagesForCompletionsAPI = (
