@@ -39,7 +39,7 @@ export const tools = [
     function: {
       name: "getWeather",
       description:
-        "Get the weather for a location. Call this whenever you need to know the weather, for example when a customer asks 'What's the weather like in San Francisco, or what should I wear tomorrow?'",
+        "Get the weather for a location. Call this whenever you need to know the weather, for example when a user asks 'What's the weather like in San Francisco, or what should I wear tomorrow?'",
       parameters: {
         type: "object",
         properties: {
@@ -58,7 +58,7 @@ export const tools = [
     function: {
       name: "getAverageNumber",
       description:
-        "Get the average of a list of numbers. Call this whenever you need to calculate the average of a list of numbers, for example when a customer asks 'What's the average of 1, 2, and 3?'",
+        "Get the average of a list of numbers. Call this whenever you need to calculate the average of a list of numbers, for example when a user asks 'What's the average of 1, 2, and 3?'",
       parameters: {
         type: "object",
         properties: {
@@ -75,18 +75,37 @@ export const tools = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "getFoodRecommendationsInNewYork",
+      description:
+        "Get food recommendations for New York. Call this whenever you need to recommend food in New York, for example when a user asks 'What's a good place to eat lunch in New York?'",
+    },
+  },
 ];
 
 const getAverageNumber = async (input: { numbers: number[] }) => {
-  console.log("CALCULATING AVERAGE OF: ", input.numbers);
   const { numbers } = input;
   const sum = numbers.reduce((acc, num) => acc + num, 0);
   return { average: sum / numbers.length };
 };
 
+const getFoodRecommendationsInNewYork = async () => {
+  return {
+    recommendations: [
+      "Katz's Delicatessen",
+      "John’s of Bleecker Street",
+      "Mamoun's Falafel",
+      "Gotham Burger Social Club",
+    ],
+  };
+};
+
 const toolsFunctionMap: { [key: string]: Function } = {
   getWeather,
   getAverageNumber,
+  getFoodRecommendationsInNewYork,
 };
 
 ////// TOOL PROCESSING //////
