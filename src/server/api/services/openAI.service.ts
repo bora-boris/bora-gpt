@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 const openai = new OpenAI();
 import { type Prisma, MESSAGE_SOURCES } from "@prisma/client";
+import { getWeather } from "./weather.service";
 
 type ConversationWithMessages = Prisma.ConversationGetPayload<{
   include: { messages: true };
@@ -33,32 +34,26 @@ export const tools = [
   {
     type: "function",
     function: {
-      name: "getDeliveryDate",
+      name: "getWeather",
       description:
-        "Get the delivery date for a customer's order. Call this whenever you need to know the delivery date, for example when a customer asks 'Where is my package'",
+        "Get the weather for a location. Call this whenever you need to know the weather, for example when a customer asks 'What's the weather like in San Francisco, or what should I wear tomorrow?'",
       parameters: {
         type: "object",
         properties: {
-          order_id: {
+          city: {
             type: "string",
-            description: "The customer's order ID.",
+            description: "The city the user is asking for the weather.",
           },
         },
-        required: ["order_id"],
+        required: ["city"],
         additionalProperties: false,
       },
     },
   },
 ];
 
-export const getDeliveryDate = (input: { order_id: string }) => {
-  console.log("SAMPLE FUNCTION CALLED with args: ", input?.order_id);
-
-  return { delivery_date: "1988-08-03" };
-};
-
 const toolsFunctionMap: { [key: string]: Function } = {
-  getDeliveryDate,
+  getWeather,
 };
 
 const buildMessagesForCompletionsAPI = (
