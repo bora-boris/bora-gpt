@@ -123,7 +123,6 @@ export const getResponseFromOpenAI = async (
     messages: existingMessages,
     tools,
   });
-  console.log("completion: ", completion);
 
   let message = completion?.choices[0]?.message;
   const toolCalls = message?.tool_calls ?? [];
@@ -145,8 +144,6 @@ export const getResponseFromOpenAI = async (
   }
 
   console.log("message content: ", JSON.stringify(message));
-  const finish_reason = completion.choices[0]?.finish_reason;
-  console.log("finish_reason: ", finish_reason);
 
   return message?.content;
 };
