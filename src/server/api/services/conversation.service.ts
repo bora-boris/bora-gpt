@@ -34,6 +34,7 @@ const addMessageToConversation = async (input: {
   message: string;
   conversationId: number;
   messageSource: MESSAGE_SOURCES;
+  tone?: string;
 }) => {
   await db.conversation.update({
     where: { id: input.conversationId },
@@ -43,6 +44,7 @@ const addMessageToConversation = async (input: {
         create: {
           content: input.message,
           source: input.messageSource,
+          tone: input.tone,
         },
       },
     },
@@ -78,12 +80,13 @@ export const submitUserMessage = async (input: {
 export const generateSystemResponse = async (
   conversation: ConversationWithMessages,
 ): Promise<void> => {
-  const messageResponse = await getResponseFromOpenAI(conversation);
-  const content = messageResponse ?? "Sorry, I am not able to respond to that.";
+  const { message, tone } = await getResponseFromOpenAI(conversation);
+  const content = message ?? "Sorry, I am not able to respond to that.";
 
   await addMessageToConversation({
     message: String(content),
     conversationId: conversation.id,
     messageSource: MESSAGE_SOURCES.SYSTEM,
+    tone,
   });
 };

@@ -2,6 +2,7 @@ import OpenAI from "openai";
 const openai = new OpenAI();
 import { type Prisma, MESSAGE_SOURCES } from "@prisma/client";
 import { getWeather } from "./weather.service";
+import trim from "lodash/trim";
 
 type ConversationWithMessages = Prisma.ConversationGetPayload<{
   include: { messages: true };
@@ -51,6 +52,30 @@ export const tools = [
     },
   },
 ];
+
+const getToneForMessage = async (message: string): Promise<string> => {
+  console.log("getting tone for this message: ", message);
+  const tonePrompt = `
+  Given the following message, if it relates to weather, please categorize the response as Sunny, Cloudy, Rainy, or Not Applicable.
+  The message is ${message};
+
+  Please respond with any of the following options: "sunny", "cloudy", "rainy", or "none".
+  `;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [{ role: openAIRoles.USER, content: tonePrompt }],
+    tools,
+  });
+  let tone = completion?.choices[0]?.message?.content;
+  console.log("tone: ", tone);
+  console.log("typeof tone: ", typeof tone);
+  if (typeof tone !== "string") {
+    return "none";
+  }
+
+  return trim(tone);
+};
 
 const toolsFunctionMap: { [key: string]: Function } = {
   getWeather,
@@ -107,9 +132,10 @@ const processToolCall = async (toolCall: ToolCall) => {
 
 export const getResponseFromOpenAI = async (
   conversation: ConversationWithMessages,
-) => {
+): Promise<{ message: string; tone: string }> => {
   const existingMessages = buildMessagesForCompletionsAPI(conversation);
   const messagesToAdd = [];
+  let tone = "none";
 
   console.log("Message chain: ", existingMessages);
 
@@ -138,7 +164,11 @@ export const getResponseFromOpenAI = async (
     console.log("rerunCompletion: ", rerunCompletion?.choices[0]);
   }
 
-  console.log("message content: ", JSON.stringify(message));
+  const response = message?.content;
 
-  return message?.content;
+  if (typeof response === "string" && response.length) {
+    tone = await getToneForMessage(response);
+  }
+
+  return { message: response, tone };
 };

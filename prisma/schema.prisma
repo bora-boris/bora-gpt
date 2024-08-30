@@ -30,6 +30,7 @@ model Message {
   id             Int      @id @default(autoincrement())
   content        String
   source         MESSAGE_SOURCES
+  tone           String @default ("none")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   conversationId Int
