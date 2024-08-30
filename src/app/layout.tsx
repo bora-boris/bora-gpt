@@ -6,8 +6,8 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Bora GPT",
-  description: "ReAct based GPT-3 powered chatbot",
+  title: "Bora-GPT",
+  description: "This is a Chat-GPT style application, intended to demonstrate the use of ReAct prompting via OpenAI function calling.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

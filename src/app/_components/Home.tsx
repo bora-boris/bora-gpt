@@ -158,7 +158,7 @@ export const Home = () => {
         <header className="flex h-16 items-center border-b bg-muted/40 px-4 md:px-6">
           <div className="flex items-center gap-3">
             <div>
-              <div className="font-bold">Bora GPT</div>
+              <div className="font-bold">Bora-GPT</div>
             </div>
           </div>
         </header>
