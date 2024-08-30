@@ -13,8 +13,9 @@ import { SendIcon } from "./icons/SendIcon";
 
 import { api } from "~/trpc/react";
 import { useCookies } from "react-cookie";
+import { MESSAGE_SOURCES, Conversation } from "@prisma/client";
 
-const POLLING_INTERVAL = 2000;
+const POLLING_INTERVAL = 3000;
 
 export const Home = () => {
   const [cookies] = useCookies(["session-id"]);
@@ -22,6 +23,7 @@ export const Home = () => {
   const [activeConversation, setActiveConversation] = useState(null);
   const [messageText, setMessageText] = useState("");
   const [intervalTrigger, setIntervalTrigger] = useState(1);
+  const [isAwaitingAIResponse, setIsAwaitingAIResponse] = useState(false);
 
   const handleMessageChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>,
@@ -53,8 +55,21 @@ export const Home = () => {
     refetchConversation();
   }, [intervalTrigger]);
 
+  const getSourceOfLastMessage = (conversation: Conversation): string => {
+    const messages = conversation?.messages || [];
+    const lastMessage = messages[messages.length - 1];
+
+    return lastMessage?.source;
+  };
+
   useEffect(() => {
     setActiveConversation(conversation);
+
+    if (getSourceOfLastMessage(conversation) === MESSAGE_SOURCES.USER) {
+      setIsAwaitingAIResponse(true);
+    } else {
+      setIsAwaitingAIResponse(false);
+    }
   }, [conversation?.updatedAt]);
 
   const createConversationMutation = api.conversation.create.useMutation();
@@ -147,7 +162,10 @@ export const Home = () => {
         </header>
         <div className="flex-1 overflow-auto p-4">
           <div className="grid gap-4">
-            <MessageList messages={activeConversation?.messages} />
+            <MessageList
+              messages={activeConversation?.messages}
+              isLoading={isAwaitingAIResponse}
+            />
           </div>
         </div>
         <div className="border-t bg-muted/40 p-4">
