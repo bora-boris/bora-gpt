@@ -23,7 +23,7 @@ export const ConversationItem: React.FC<{
           {conversation.preview}
         </div>
       </div>
-      <div className="text-xs text-muted-foreground">
+      <div className="mt-1 self-start text-xs text-muted-foreground">
         {getTimeSince(conversation.updatedAt)}
       </div>
     </Link>

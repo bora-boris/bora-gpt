@@ -5,6 +5,7 @@ import {
   type Conversation,
 } from "@prisma/client";
 import { getResponseFromOpenAI } from "./openAI.service";
+import { formatConversationPreview } from "../utils/formatting";
 
 // Had to do this since Prisma doesn't export a Model's relations in the type definitions by default
 // https://github.com/prisma/prisma/discussions/10928
@@ -36,10 +37,18 @@ const addMessageToConversation = async (input: {
   messageSource: MESSAGE_SOURCES;
   tone?: string;
 }) => {
+  const updatedPreview =
+    input.messageSource === MESSAGE_SOURCES.USER
+      ? {
+          preview: formatConversationPreview(input.message),
+        }
+      : {};
+  const conversationPreview = formatConversationPreview(input.message);
+
   await db.conversation.update({
     where: { id: input.conversationId },
     data: {
-      preview: input.message,
+      ...updatedPreview,
       messages: {
         create: {
           content: input.message,
