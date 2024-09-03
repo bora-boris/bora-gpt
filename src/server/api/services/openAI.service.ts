@@ -110,26 +110,37 @@ const toolsFunctionMap: { [key: string]: Function } = {
 
 ////// TOOL PROCESSING //////
 
-const getToneForMessage = async (message: string): Promise<string> => {
-  const tonePrompt = `
-  Given the following message, if it relates to weather, please categorize the response as Sunny, Cloudy, Rainy, or Not Applicable.
-  The message is ${message};
-
-  Please respond with any of the following options: "sunny", "cloudy", "rainy", or "none".
+const getImageForWeather = async (message: string): Promise<string> => {
+  const weatherPrompt = `
+    Given the following message, if it relates to weather, return true. If not return false
+    The message is ${message};
   `;
 
-  const completion = await openai.chat.completions.create({
+  const weatherPromptResult = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: openAIRoles.USER, content: tonePrompt }],
+    messages: [{ role: openAIRoles.USER, content: weatherPrompt }],
     tools,
   });
-  let tone = completion?.choices[0]?.message?.content;
 
-  if (typeof tone !== "string") {
-    return "none";
+  const weatherPromptResultContent =
+    weatherPromptResult?.choices[0]?.message?.content;
+
+  if (
+    typeof weatherPromptResultContent !== "string" ||
+    trim(weatherPromptResultContent).toLowerCase() !== "true"
+  ) {
+    return null;
   }
 
-  return trim(tone);
+  const widgetGenerationPrompt = `Please generate a weather widge for the following weather: ${message}`;
+  const completion = await openai.images.generate({
+    model: "dall-e-3",
+    prompt: widgetGenerationPrompt,
+    n: 1,
+    size: "1024x1024",
+  });
+
+  return completion?.data[0]?.url;
 };
 
 // Take the history of the conversation and feed it to the OpenAI API
@@ -183,12 +194,12 @@ const processToolCall = async (toolCall: ToolCall) => {
 
 export const getResponseFromOpenAI = async (
   conversation: ConversationWithMessages,
-): Promise<{ message: string; tone: string }> => {
+): Promise<{ message: string; image: string }> => {
   const existingMessages = buildMessagesForCompletionsAPI(conversation);
   const messagesToAdd = [];
-  let tone = "none";
+  let image = null;
 
-  const completion = await openai.chat.completions.create({
+  let completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: existingMessages,
     tools,
@@ -206,13 +217,13 @@ export const getResponseFromOpenAI = async (
       messagesToAdd.push(resultMessage);
     }
 
-    const rerunCompletion = await openai.chat.completions.create({
+    completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [...existingMessages, ...messagesToAdd],
       tools,
     });
 
-    message = rerunCompletion?.choices[0]?.message;
+    message = completion?.choices[0]?.message;
     // Chaining tool calls until openAI is satisfied and doesn't need more function calling
     toolCalls = message?.tool_calls ?? [];
   }
@@ -220,8 +231,8 @@ export const getResponseFromOpenAI = async (
   const response = message?.content;
 
   if (typeof response === "string" && response.length) {
-    tone = await getToneForMessage(response);
+    image = await getImageForWeather(response);
   }
 
-  return { message: response, tone };
+  return { message: response, image };
 };
