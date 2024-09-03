@@ -197,12 +197,15 @@ export const getResponseFromOpenAI = async (
   let message = completion?.choices[0]?.message;
   const toolCalls = message?.tool_calls ?? [];
 
+  console.log("toolCalls: ", toolCalls);
+
   // If OpenAI has requested to us our toolbox, let them!
   // We'll process the tool calls and add the results to the conversation
   if (toolCalls.length) {
     messagesToAdd.push(completion?.choices[0]?.message);
     for (const toolCall of toolCalls) {
       const resultMessage = await processToolCall(toolCall);
+      console.log("resultMessage: ", resultMessage);
       messagesToAdd.push(resultMessage);
     }
 
@@ -211,7 +214,13 @@ export const getResponseFromOpenAI = async (
       messages: [...existingMessages, ...messagesToAdd],
       tools,
     });
+
+    console.log("rerunning Completion with messages: ", [
+      ...existingMessages,
+      ...messagesToAdd,
+    ]);
     message = rerunCompletion?.choices[0]?.message;
+    console.log("message Result after rerun: ", message);
   }
 
   const response = message?.content;
