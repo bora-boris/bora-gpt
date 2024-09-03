@@ -3,6 +3,7 @@
 This is a Chat-GPT style application, intended to demonstrate the use of ReAct prompting via OpenAI function calling.
 
 ## Cool Technologies Used
+
 - [Next.js](https://nextjs.org)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
@@ -12,13 +13,16 @@ This is a Chat-GPT style application, intended to demonstrate the use of ReAct p
 ## Getting Started
 
 ### Environment Variables
+
 You'll need to define these to interact with the external APIs
+
 - **OPENAI_API_KEY** (you can get one directly from OpenAI. I am on one of the minimum paid tiers)
 - **OPENAI_MODEL** (I chose one of the newer ones gpt-4o-mini)
-- **WEATHER_API_KEY** ([you can get one here](https://www.weatherapi.com/))
+- **OPEN_WEATHER_API_KEY** ([you can get one here](https://www.weatherbit.io/))
 - **DATABASE_URL** (use this to connect to your local PostgreSQL db. I left my example in .env.example)
 
-### Get up and running 
+### Get up and running
+
 - yarn install
 - yarn db:generate (run migrations on the db)
 - yarn run dev
